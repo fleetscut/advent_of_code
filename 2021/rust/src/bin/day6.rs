@@ -3,12 +3,7 @@ use std::collections::VecDeque;
 fn main() {
     // let path = "./data/day6ex.txt";
     let path = "./data/day6.txt";
-    let input: Vec<String> = aoc::read_from_file(path);
-
-    let input: Vec<u64> = input
-        .iter()
-        .flat_map(|line| line.split(',').map(|num| num.parse().unwrap()))
-        .collect();
+    let input = aoc::read_one_line(path, ",");
 
     let count = tick(&input, 80);
     println!("Part one: {}", count);
