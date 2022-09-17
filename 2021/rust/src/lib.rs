@@ -1,5 +1,5 @@
 use std::fmt::Debug;
-use std::fs::{self, read_to_string};
+use std::fs::read_to_string;
 use std::str::FromStr;
 
 pub fn read_from_file<T>(path: &str) -> Vec<T>
