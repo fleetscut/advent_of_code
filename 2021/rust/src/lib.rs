@@ -26,3 +26,20 @@ where
         .map(|val| val.parse::<T>().unwrap())
         .collect()
 }
+
+pub fn read_matrix<T>(path: &str) -> Vec<Vec<T>>
+where
+    T: FromStr,
+    <T as FromStr>::Err: Debug,
+{
+    read_to_string(path)
+        .expect("Could not open file")
+        .lines()
+        .map(|line| {
+            line.trim()
+                .chars()
+                .map(|c| c.to_string().parse::<T>().unwrap())
+                .collect()
+        })
+        .collect()
+}
