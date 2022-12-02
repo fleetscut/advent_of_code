@@ -22,6 +22,7 @@ fn main() {
 }
 
 fn part_one(input: &str) -> i32 {
+    let lines: Vec<_> = input.split('\n').collect();
     *get_calories(input).last().unwrap()
 }
 
