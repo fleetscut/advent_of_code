@@ -1,4 +1,85 @@
-use std::fs::read_to_string;
+use std::{fs::read_to_string, str::FromStr};
+
+use anyhow::{Error, Result};
+
+#[derive(Debug)]
+struct Crane {
+    stacks: Vec<Vec<char>>,
+}
+
+impl FromStr for Crane {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut crates = s.lines().rev();
+        let size = (crates.next().unwrap().len() + 1) / 4;
+        let mut stacks = vec![Vec::new(); size];
+
+        crates.for_each(|line| {
+            line.chars().enumerate().for_each(|val| {
+                if val.1.is_alphabetic() {
+                    stacks[val.0 / 4].push(val.1);
+                }
+            })
+        });
+
+        Ok(Self { stacks })
+    }
+}
+
+impl Crane {
+    fn move_crates9000(&mut self, command: &Command) {
+        (0..command.count).for_each(|_| {
+            let to_move = self.stacks[command.from].pop().expect("Stack is empty");
+            self.stacks[command.to].push(to_move);
+        });
+    }
+
+    fn move_crates9001(&mut self, command: &Command) {
+        let mut to_move: Vec<char> = (0..command.count)
+            .map(|_| self.stacks[command.from].pop().unwrap())
+            .collect();
+
+        to_move.reverse();
+        self.stacks[command.to].extend_from_slice(&to_move);
+    }
+
+    fn get_top(&self) -> String {
+        self.stacks
+            .iter()
+            .map(|stack| stack.last().unwrap())
+            .collect()
+    }
+}
+
+#[derive(Debug)]
+struct Command {
+    count: usize,
+    from: usize,
+    to: usize,
+}
+
+impl FromStr for Command {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(s.split(' ')
+            .filter_map(|c| c.parse::<usize>().ok())
+            .collect::<Self>())
+    }
+}
+
+impl FromIterator<usize> for Command {
+    fn from_iter<T: IntoIterator<Item = usize>>(iter: T) -> Self {
+        let mut iter = iter.into_iter();
+
+        Self {
+            count: iter.next().unwrap(),
+            from: iter.next().unwrap() - 1,
+            to: iter.next().unwrap() - 1,
+        }
+    }
+}
 
 fn main() {
     let day = 5;
@@ -19,90 +100,32 @@ fn main() {
     println!("Part Two: {}", p2);
 }
 
+fn setup(input: &str) -> (Crane, Vec<Command>) {
+    let (crane, commands) = input.split_once("\n\n").unwrap();
+
+    let crane = crane.parse::<Crane>().unwrap();
+    let commands: Vec<Command> = commands
+        .lines()
+        .map(|line| line.parse::<Command>().unwrap())
+        .collect();
+
+    (crane, commands)
+}
+
 fn part_one(input: &str) -> String {
-    let (crates, commands) = input.split_once("\n\n").unwrap();
-
-    let mut crates: Vec<&str> = crates.lines().collect();
-    let commands: Vec<&str> = commands.lines().collect();
-
-    crates.reverse();
-
-    let mut stacks = create_stack(&crates);
-    let commands = create_commands(&commands);
-
-    move_crates9000(&mut stacks, &commands);
-
-    stacks.iter().map(|stack| stack.last().unwrap()).collect()
-}
-
-fn create_stack(crates: &[&str]) -> Vec<Vec<char>> {
-    let mut crates = crates.iter();
-    let size = crates.next().unwrap();
-    let size = (size.len() + 1) / 4;
-
-    let mut stacks: Vec<Vec<char>> = Vec::new();
-
-    for _ in 0..size {
-        stacks.push(Vec::new());
-    }
-
-    for line in crates {
-        line.chars().enumerate().for_each(|val| {
-            if val.1.is_alphabetic() {
-                stacks[val.0 / 4].push(val.1);
-            }
-        })
-    }
-
-    stacks
-}
-
-fn move_crates9001(stacks: &mut [Vec<char>], commands: &[Vec<i32>]) {
-    for command in commands {
-        let mut to_move = Vec::new();
-        for _ in 0..command[0] {
-            to_move.push(stacks[command[1] as usize - 1].pop().unwrap());
-        }
-
-        to_move.reverse();
-        stacks[command[2] as usize - 1].extend_from_slice(&to_move);
-    }
-}
-
-fn move_crates9000(stacks: &mut [Vec<char>], commands: &[Vec<i32>]) {
-    for command in commands {
-        for _ in 0..command[0] {
-            let to_move = stacks[command[1] as usize - 1]
-                .pop()
-                .expect("Stack is empty");
-            stacks[command[2] as usize - 1].push(to_move);
-        }
-    }
-}
-
-fn create_commands(commands: &[&str]) -> Vec<Vec<i32>> {
+    let (mut crane, commands) = setup(input);
     commands
         .iter()
-        .map(|line| {
-            line.split(' ')
-                .filter_map(|c| c.parse::<i32>().ok())
-                .collect()
-        })
-        .collect()
+        .for_each(|command| crane.move_crates9000(command));
+
+    crane.get_top()
 }
 
-fn part_two(input: &String) -> String {
-    let (crates, commands) = input.split_once("\n\n").unwrap();
+fn part_two(input: &str) -> String {
+    let (mut crane, commands) = setup(input);
+    commands
+        .iter()
+        .for_each(|command| crane.move_crates9001(command));
 
-    let mut crates: Vec<&str> = crates.lines().collect();
-    let commands: Vec<&str> = commands.lines().collect();
-
-    crates.reverse();
-
-    let mut stacks = create_stack(&crates);
-    let commands = create_commands(&commands);
-
-    move_crates9001(&mut stacks, &commands);
-
-    stacks.iter().map(|stack| stack.last().unwrap()).collect()
+    crane.get_top()
 }
