@@ -1,6 +1,50 @@
 use aoc::read_lines_from_file;
 use std::cmp::max;
 use std::cmp::min;
+use std::str::FromStr;
+
+#[derive(Debug)]
+struct Pairs {
+    one: (i32, i32),
+    two: (i32, i32),
+}
+
+impl FromStr for Pairs {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let pair: Vec<i32> = s
+            .split(',')
+            .flat_map(|c| c.split('-').map(|y| y.parse::<i32>().unwrap()))
+            .collect();
+
+        Ok(Self {
+            one: (pair[0], pair[1]),
+            two: (pair[2], pair[3]),
+        })
+    }
+}
+
+impl Pairs {
+    fn contains(&self) -> bool {
+        if self.one.0 >= self.two.0 && self.one.1 <= self.two.1
+            || self.two.0 >= self.one.0 && self.two.1 <= self.one.1
+        {
+            return true;
+        }
+
+        false
+    }
+
+    fn overlaps(&self) -> bool {
+        if self.one.0 >= self.two.0 && self.one.0 <= self.two.1
+            || self.two.0 >= self.one.0 && self.two.0 <= self.one.1
+        {
+            return true;
+        }
+        false
+    }
+}
 
 fn main() {
     let day = 4;
@@ -14,49 +58,25 @@ fn main() {
     println!("Part One Example: {}", p1);
     let p1 = part_one(&input);
     println!("Part One: {}", p1);
-    // part_two(&example_input);
+
     let p2 = part_two(&example_input);
     println!("Part Two Example: {}", p2);
     let p2 = part_two(&input);
     println!("Part Two: {}", p2);
 }
 
-fn part_one(input: &Vec<String>) -> i32 {
-    let mut count = 0;
-
-    let pairs = get_pairs(input);
-
-    for pair in &pairs {
-        if (pair[0]..=pair[1]).contains(&pair[2]) && (pair[0]..=pair[1]).contains(&pair[3])
-            || (pair[2]..=pair[3]).contains(&pair[0]) && (pair[2]..=pair[3]).contains(&pair[1])
-        {
-            count += 1;
-        }
-    }
-    count
-}
-
-fn get_pairs(input: &Vec<String>) -> Vec<Vec<i32>> {
+fn part_one(input: &[String]) -> i32 {
     input
         .iter()
-        .map(|line| {
-            line.split(',')
-                .flat_map(|c| c.split('-').map(|y| y.parse::<i32>().unwrap()))
-                .collect()
-        })
-        .collect()
+        .map(|line| line.parse::<Pairs>().unwrap())
+        .filter(|pair| pair.contains())
+        .fold(0, |acc, _| acc + 1)
 }
 
-fn part_two(input: &Vec<String>) -> i32 {
-    let mut count = 0;
-    let pairs = get_pairs(input);
-
-    for pair in pairs {
-        if max(pair[1], pair[3]) - min(pair[0], pair[2])
-            <= (pair[1] - pair[0]) + (pair[3] - pair[2])
-        {
-            count += 1;
-        }
-    }
-    count
+fn part_two(input: &[String]) -> i32 {
+    input
+        .iter()
+        .map(|line| line.parse::<Pairs>().unwrap())
+        .filter(|pair| pair.overlaps())
+        .fold(0, |acc, _| acc + 1)
 }
