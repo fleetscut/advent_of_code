@@ -30,7 +30,7 @@ impl Cpu {
         }
     }
 
-    fn run(&mut self, crt: Option<&mut Crt>) -> i32 {
+    fn run(&mut self, mut crt: Option<&mut Crt>) -> i32 {
         let mut signal = 0;
 
         while let Some(instruction) = self.instructions.pop_front() {
@@ -38,7 +38,7 @@ impl Cpu {
                 if self.cycle_count % 40 == 20 {
                     signal += self.cycle_count * self.x;
                 }
-                if let Some(&mut ref mut x) = crt {
+                if let Some(x) = &mut crt {
                     x.update_pixel(self.cycle_count, self.x);
                 }
                 let test = crt.as_ref();
