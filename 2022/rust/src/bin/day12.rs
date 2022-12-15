@@ -7,15 +7,23 @@ fn main() {
     let input_path = format!("./data/day{}.txt", day);
 
     let example_input = read_to_string(&example_path).expect("Could not open file");
-    // let input = read_to_string(input_path).expect("Could not open file");
+    let input = read_to_string(input_path).expect("Could not open file");
 
     let p1 = part_one(&example_input);
+    println!("Part One Example: {}", p1);
+    let p1 = part_one(&input);
+    println!("Part One: {}", p1);
+
+    let p2 = part_two(&example_input);
+    println!("Part Two Example: {}", p2);
+    let p2 = part_two(&input);
+    println!("Part Two: {}", p2);
     // part_two(&example_input);
 }
 
-fn part_one(input: &str) -> i32 {
+fn find_path(input: &str, multiple_paths: bool) -> i32 {
     let mut grid = dijkstra::Grid::new();
-    let mut start = 0;
+    let mut start = Vec::new();
     let mut end = 0;
     let input: Vec<Vec<i32>> = input
         .lines()
@@ -25,15 +33,22 @@ fn part_one(input: &str) -> i32 {
                 .enumerate()
                 .map(|(y, c)| match c {
                     'S' => {
-                        start = x * line.len() + y;
-                        0
+                        start.push(x * line.len() + y);
+                        'a'
+                    }
+                    'a' => {
+                        if multiple_paths {
+                            start.push(x * line.len() + y);
+                        }
+                        'a'
                     }
                     'E' => {
                         end = x * line.len() + y;
-                        25
+                        'z'
                     }
-                    c => c as i32 - 97,
+                    c => c,
                 })
+                .map(|c| c as i32)
                 .collect()
         })
         .collect();
@@ -41,9 +56,16 @@ fn part_one(input: &str) -> i32 {
     for x in 0..input.len() {
         for y in 0..input[0].len() {
             // print!("{:02},", one_d_index(x, y, input[0].len()));
-            print!("{:02},", input[x][y]);
+            // print!("{:02},", input[x][y]);
         }
-        println!();
+        // println!();
+    }
+    // println!();
+    for x in 0..input.len() {
+        for y in 0..input[0].len() {
+            // print!("{:02},", one_d_index(x, y, input[0].len()));
+        }
+        // println!();
     }
 
     let mut edges: Vec<Vec<(usize, i32)>> = Vec::new();
@@ -72,21 +94,22 @@ fn part_one(input: &str) -> i32 {
     // }
     let (path, cost) = grid.find_shortest_path(start, end).unwrap();
     for p in &path {
-        println!(
-            "{}",
-            // (input[p % input.len()][p / input[0].len()] + 97) as u8 as char
-            p
-        )
+        // println!(
+        //     "{}",
+        //     // (input[p % input.len()][p / input[0].len()] + 97) as u8 as char
+        //     p
+        // )
     }
     println!("len {}", path.len());
     println!("{:?}", cost);
-    0
+    path.len() as i32 - 1
+}
+fn part_one(input: &str) -> i32 {
+    find_path(input, false)
 }
 
-fn part_two(input: &String) -> String {
-    println!("Part Two:");
-    println!("{}", input);
-    "".to_string()
+fn part_two(input: &str) -> i32 {
+    find_path(input, true)
 }
 
 fn get_neighbors(x: usize, y: usize, x_max: usize, y_max: usize) -> Vec<(usize, usize)> {
@@ -107,9 +130,7 @@ fn get_neighbors(x: usize, y: usize, x_max: usize, y_max: usize) -> Vec<(usize, 
 }
 
 fn neighbor_filter(p1: i32, p2: i32) -> bool {
-    // p2 - p1 < 2
-    println!("{} {}", p1, p2);
-    p1 + 1 == p2
+    p2 - p1 < 2
 }
 
 fn one_d_index(x: usize, y: usize, w: usize) -> usize {

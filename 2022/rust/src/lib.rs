@@ -1,3 +1,5 @@
+pub mod dijkstra;
+
 use std::{fmt::Debug, fs::read_to_string, str::FromStr};
 
 pub fn test_print() {

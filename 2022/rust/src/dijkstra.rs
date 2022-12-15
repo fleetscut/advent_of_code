@@ -51,14 +51,17 @@ impl Grid {
         self.nodes.push(node);
     }
 
-    pub fn find_shortest_path(&self, start: usize, end: usize) -> Option<(Vec<usize>, i32)> {
+    pub fn find_shortest_path(&self, start: Vec<usize>, end: usize) -> Option<(Vec<usize>, i32)> {
         let mut dists = vec![(i32::MAX, None); self.nodes.len()];
         let mut heap = BinaryHeap::new();
-        dists[start] = (0, None);
-        heap.push(State {
-            node_id: start,
-            cost: 0,
-        });
+
+        for s in start {
+            dists[s] = (0, None);
+            heap.push(State {
+                node_id: s,
+                cost: 0,
+            });
+        }
 
         while let Some(State { node_id, cost }) = heap.pop() {
             if node_id == end {
@@ -88,5 +91,33 @@ impl Grid {
             }
         }
         None
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn dijkstra_test() {
+        let mut grid = Grid::new();
+
+        let mut list = Vec::new();
+        list.push(vec![(1, 3), (2, 1)]);
+        list.push(vec![(0, 3), (2, 4), (4, 1)]);
+        list.push(vec![(1, 4), (3, 7), (0, 1)]);
+        list.push(vec![(2, 7), (4, 5), (6, 1)]);
+        list.push(vec![(1, 1), (3, 5), (5, 2)]);
+        list.push(vec![(6, 1), (4, 2), (2, 18)]);
+
+        list.push(vec![(3, 1), (5, 1)]);
+
+        list.iter().enumerate().for_each(|(i, l)| {
+            grid.add_node(l.to_vec());
+        });
+
+        assert_eq!(
+            grid.find_shortest_path(0, 6),
+            Some(([0, 1, 4, 5, 6].to_vec(), 7))
+        );
     }
 }

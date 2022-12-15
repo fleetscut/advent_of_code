@@ -9,3 +9,4 @@ path = "src/lib.rs"
 
 [dependencies]
 anyhow = "1.0.66"
+pathfinding = "4.1.1"
