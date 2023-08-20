@@ -116,6 +116,7 @@ fn part_one(input: &Vec<String>) -> i32 {
             score += Outcome::Win.points();
         }
         total_score += score;
+        println!("{}", total_score)
     }
 
     total_score

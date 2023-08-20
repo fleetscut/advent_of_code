@@ -11,9 +11,9 @@ const filename = path.join(__dirname, `src/${day}/input.txt`);
 
 if (process.argv[3] === "test") {
   console.log("Test Part One");
-  solution.testPartOne(testFilename);
+  solution.partOne(testFilename);
   console.log("Test Part Two:");
-  solution.testPartTwo(testFilename);
+  solution.partTwo(testFilename);
 } else {
   console.log("Part One:");
   solution.partOne(filename);

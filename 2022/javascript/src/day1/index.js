@@ -17,18 +17,6 @@ const getCalories = (input, topNum) => {
   console.log(`Highest Calories: ${topSum}`);
 };
 
-const testPartOne = (filename) => {
-  const input = getInput.readAsString(filename);
-
-  getCalories(input, 1);
-};
-
-const testPartTwo = (filename) => {
-  const input = getInput.readAsString(filename);
-
-  getCalories(input, 3);
-};
-
 const partOne = (filename) => {
   const input = getInput.readAsString(filename);
 
@@ -42,8 +30,6 @@ const partTwo = (filename) => {
 };
 
 module.exports = {
-  testPartOne,
-  testPartTwo,
   partOne,
   partTwo,
 };
