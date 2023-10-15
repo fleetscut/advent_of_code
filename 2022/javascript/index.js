@@ -1,10 +1,13 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const day = process.argv[2];
 
-const dayPath = path.join(__dirname, `src/${day}`);
-const solution = require(dayPath);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const dayPath = path.join(__dirname, `src/${day}/index.js`);
+const solution = await import(dayPath);
 
 const testFilename = path.join(__dirname, `src/${day}/example.txt`);
 const filename = path.join(__dirname, `src/${day}/input.txt`);

@@ -1,5 +1,4 @@
-const { getInput } = require("../utils");
-const path = require("path");
+import * as getInput from "../utils/getInput.js";
 
 const getCalories = (input, topNum) => {
   let calories = input.split(/\n\s*\n/).map((line) => {
@@ -17,19 +16,14 @@ const getCalories = (input, topNum) => {
   console.log(`Highest Calories: ${topSum}`);
 };
 
-const partOne = (filename) => {
+export const partOne = (filename) => {
   const input = getInput.readAsString(filename);
 
   getCalories(input, 1);
 };
 
-const partTwo = (filename) => {
+export const partTwo = (filename) => {
   const input = getInput.readAsString(filename);
 
   getCalories(input, 3);
-};
-
-module.exports = {
-  partOne,
-  partTwo,
 };

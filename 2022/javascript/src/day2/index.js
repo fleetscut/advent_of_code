@@ -1,4 +1,4 @@
-const { getInput } = require("../utils");
+import * as getInput from "../utils/getInput.js";
 
 const getMoves = (input) => {
   const moveMap = { A: 1, B: 2, C: 3, X: 1, Y: 2, Z: 3 };
@@ -9,7 +9,7 @@ const getMoves = (input) => {
     });
 };
 
-const partOne = (filename) => {
+export const partOne = (filename) => {
   const input = getInput.readAsArray(filename);
   const moves = getMoves(input);
 
@@ -35,7 +35,8 @@ const partOne = (filename) => {
 
   console.log(score);
 };
-const partTwo = (filename) => {
+
+export const partTwo = (filename) => {
   const input = getInput.readAsArray(filename);
   const moves = getMoves(input);
 
@@ -57,9 +58,4 @@ const partTwo = (filename) => {
   }
 
   console.log(score);
-};
-
-module.exports = {
-  partOne,
-  partTwo,
 };
