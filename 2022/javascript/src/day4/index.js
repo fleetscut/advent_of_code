@@ -5,7 +5,9 @@ export const partOne = (filename) => {
 
   const contains = input
     .map((pair) => pair.split(","))
-    .map((sections) => sections.map((section) => section.split("-")))
+    .map((sections) =>
+      sections.map((section) => section.split("-").map(Number)),
+    )
     .map((pair) =>
       (pair[0][0] >= pair[1][0] && pair[0][1] <= pair[1][1]) ||
       (pair[1][0] >= pair[0][0] && pair[1][1] <= pair[0][1])
@@ -22,16 +24,12 @@ export const partTwo = (filename) => {
     .map((sections) =>
       sections.map((section) => section.split("-").map(Number)),
     )
-    .map((pair) => {
-      console.log(pair);
-      const result =
-        (pair[0][0] >= pair[1][0] && pair[0][0] <= pair[1][1]) ||
-        (pair[1][0] >= pair[0][0] && pair[1][0] <= pair[0][1])
-          ? true
-          : false;
-      console.log(result);
-      return result;
-    })
+    .map((pair) =>
+      (pair[0][0] >= pair[1][0] && pair[0][0] <= pair[1][1]) ||
+      (pair[1][0] >= pair[0][0] && pair[1][0] <= pair[0][1])
+        ? true
+        : false,
+    )
     .reduce((acc, num) => acc + num);
   console.log(`Number of overlapping pairs: ${overlaps}`);
 };
