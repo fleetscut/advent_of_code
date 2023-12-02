@@ -25,7 +25,6 @@ const getCalibrationValue = (
     }
   }
 
-  console.log(input);
   return input
     .map((line) => line.split("").filter((c) => parseInt(c)))
     .map((val) => parseInt(val[0] + val.at(-1)))
