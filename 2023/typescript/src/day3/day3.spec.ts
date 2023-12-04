@@ -1,19 +1,20 @@
-import { partOne, partTwo } from "./day2";
+import { partOne, partTwo } from "./day3";
 import path from "path";
 
-describe("Day 2 - TEST", () => {
+describe("Day 3 - TEST", () => {
   test("Part One", () => {
     const input = path.join(import.meta.dir, "example.txt");
-    const output = 8;
+    const output = 4361;
 
     expect(partOne(input)).toEqual(output);
   });
+});
+
+describe("Day 3 - TEST", () => {
   test("Part Two", () => {
     const input = path.join(import.meta.dir, "example.txt");
-    const output = 2286;
+    const output = 467835;
 
     expect(partTwo(input)).toEqual(output);
   });
 });
-
-describe("Day 2 - TEST", () => {});
