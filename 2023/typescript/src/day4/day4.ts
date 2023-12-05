@@ -1,19 +1,6 @@
 import { readAsStringArray } from "../utils/getInput";
 
-const checkWinningPoints = (input: string[]) => {
-  return input
-    .map((game) => game.split(":")[1].split("|"))
-    .map((game) =>
-      checkCardPoints(
-        new Set(game[0].trim().split(/\s+/)),
-        game[1].trim().split(/\s+/),
-      ),
-    )
-    .reduce((acc, num) => acc + num);
-};
-
-const checkWinning = (input: string[]) => {
-  const numTickets = input.length;
+const checkWinning = (input: string[]): number[] => {
   const prizeList: number[] = [];
   input
     .map((game) => game.split(":")[1].split("|"))
@@ -25,7 +12,10 @@ const checkWinning = (input: string[]) => {
         ),
       ),
     );
+  return prizeList;
+};
 
+const copyCards = (numTickets: number, prizeList: number[]) => {
   const cardCount = Array<number>(numTickets).fill(1);
 
   for (let i = 0; i < numTickets; i++) {
@@ -36,17 +26,6 @@ const checkWinning = (input: string[]) => {
   }
 
   return [...cardCount.values()].reduce((acc, val) => acc + val);
-};
-
-const checkCardPoints = (winning: Set<string>, ticket: string[]) => {
-  let points = 0;
-  ticket.forEach((num) => {
-    if (winning.has(num)) {
-      if (points == 0) points++;
-      else points *= 2;
-    }
-  });
-  return points;
 };
 
 const checkCard = (winning: Set<string>, ticket: string[]) => {
@@ -61,10 +40,17 @@ const checkCard = (winning: Set<string>, ticket: string[]) => {
 
 export const partOne = (filename: string): number => {
   const input = readAsStringArray(filename);
-  return checkWinningPoints(input);
+  const prizeList = checkWinning(input);
+  return prizeList
+    .map((prize) => {
+      if (prize > 0) return Math.pow(2, prize - 1);
+      else return 0;
+    })
+    .reduce((acc, val) => acc + val);
 };
 
 export const partTwo = (filename: string) => {
   const input = readAsStringArray(filename);
-  return checkWinning(input);
+  const prizeList = checkWinning(input);
+  return copyCards(input.length, prizeList);
 };
