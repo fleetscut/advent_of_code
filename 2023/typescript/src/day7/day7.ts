@@ -6,17 +6,18 @@ type Hand = {
   score: number;
 };
 
-const cardStrength = "23456789TJQKA";
-
-const rankHands = (input: string[]): Hand[] => {
+const rankHands = (input: string[], handleJoker: boolean = false): Hand[] => {
   let hands = input
     .map((line) => line.split(" "))
     .map((hand) => {
-      const handMap = new Map();
+      let handMap = new Map();
+      let hasJoker = false;
       hand[0].split("").forEach((c) => {
+        if (c === "J") hasJoker = true;
         if (handMap.has(c)) handMap.set(c, handMap.get(c) + 1);
         else handMap.set(c, 1);
       });
+      if (handleJoker && hasJoker) handMap = replaceJokers(handMap);
       return {
         hand: hand[0],
         bid: parseInt(hand[1]),
@@ -25,15 +26,37 @@ const rankHands = (input: string[]): Hand[] => {
     });
   hands = hands.sort((a, b) => {
     if (a.score === b.score) {
-      return compareCards(a.hand, b.hand);
+      return compareCards(a.hand, b.hand, handleJoker);
     } else return a.score - b.score;
   });
   return hands;
 };
 
-const compareCards = (card1: string, card2: string): number => {
+const replaceJokers = (hand: Map<string, number>): Map<string, number> => {
+  let lv = 0;
+  let lk = "";
+  hand.forEach((v, k) => {
+    if (v > lv && k !== "J") {
+      lv = v;
+      lk = k;
+    }
+  });
+  let jv = hand.get("J");
+  if (jv === undefined) throw Error;
+  hand.delete("J");
+  hand.set(lk, lv + jv);
+  return hand;
+};
+
+const compareCards = (
+  card1: string,
+  card2: string,
+  handleJoker: boolean = false,
+): number => {
   const c1 = Array.from(card1);
   const c2 = Array.from(card2);
+  const cardStrength = handleJoker ? "J23456789TQKA" : "23456789JTQKA";
+
   for (let i = 0; i < c1.length; i++) {
     if (cardStrength.indexOf(c1[i]) > cardStrength.indexOf(c2[i])) return 1;
     else if (cardStrength.indexOf(c1[i]) < cardStrength.indexOf(c2[i]))
@@ -72,5 +95,11 @@ export const partOne = (filename: string): number => {
 };
 
 export const partTwo = (filename: string): number => {
-  return 0;
+  const input = readAsStringArray(filename);
+  const hands = rankHands(input, true);
+  return hands
+    .map((hand, index) => {
+      return hand.bid * (index + 1);
+    })
+    .reduce((acc, val) => acc + val);
 };
