@@ -5,6 +5,7 @@
     "target": "esnext",
     "moduleResolution": "bundler",
     "moduleDetection": "force",
+    "strictNullChecks": true,
     "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "noEmit": true,
