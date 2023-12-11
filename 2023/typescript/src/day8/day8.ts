@@ -27,9 +27,9 @@ const runMap = (
   let index = 0;
   let steps = 0;
   while (!current.match(`..${end}`)) {
-    const currentMap = map.get(current) as string[];
-    if (path[index] === "L") current = currentMap[0];
-    if (path[index] === "R") current = currentMap[1];
+    const currentMap = map.get(current);
+    if (path[index] === "L") current = currentMap![0];
+    if (path[index] === "R") current = currentMap![1];
     steps++;
     index = (index + 1) % path.length;
   }
