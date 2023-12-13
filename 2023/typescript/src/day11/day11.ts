@@ -1,9 +1,6 @@
 import { readAs2DArray, readAsStringArray } from "../utils/getInput";
 
-type Point = {
-  x: number;
-  y: number;
-};
+import { Point } from "../utils/grid";
 
 const findGalaxies = (input: string[][]): Point[] => {
   const galaxies: Point[] = [];

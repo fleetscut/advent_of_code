@@ -14,14 +14,20 @@ describe("Day 10 - TEST", () => {
 
     // expect(partOne(input)).toEqual(output);
   });
-  test("Part Two", () => {
+  test("Part Two - Example 3", () => {
     const input = path.join(import.meta.dir, "example3.txt");
     const output = 4;
 
     expect(partTwo(input)).toEqual(output);
   });
-  test("Part Two", () => {
+  test("Part Two - Example 4", () => {
     const input = path.join(import.meta.dir, "example4.txt");
+    const output = 8;
+
+    expect(partTwo(input)).toEqual(output);
+  });
+  test("Part Two - Example 5", () => {
+    const input = path.join(import.meta.dir, "example5.txt");
     const output = 10;
 
     expect(partTwo(input)).toEqual(output);

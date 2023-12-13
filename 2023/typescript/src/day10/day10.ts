@@ -35,7 +35,6 @@ const createMap = (input: string[]): [number[], string[][]] => {
       return val;
     }),
   );
-  // map.forEach((line) => console.log(line.join("")));
   return [start, map];
 };
 
@@ -69,61 +68,43 @@ const expandMap = (map: string[][]): [number[], string[][]] => {
 };
 
 const evenOddRule = (map: string[][], point: number[]): boolean => {
-  let left = false;
-  let right = false;
-  let up = false;
-  let down = false;
+  let inside = false;
 
   // Check horizontally to the left
   for (let i = point[1]; i >= 0; i--) {
-    if (map[point[0]][i] === "o") {
-      left = !left;
+    const pipe = map[point[0]][i];
+    if (pipe === "|" || pipe === "L" || pipe === "J") {
+      // console.log(point);
+      inside = !inside;
     }
   }
+  //
+  // // Check horizontally to the right
+  // for (let i = point[1]; i < map[0].length; i++) {
+  //   const pipe = map[point[0]][i];
+  //   if (pipe === "|" || pipe === "L" || pipe === "J") {
+  //     inside = !inside;
+  //   }
+  // }
+  //
+  // // Check vertically upwards
+  // for (let i = point[0]; i >= 0; i--) {
+  //   const pipe = map[i][point[1]];
+  //   if (pipe === "|" || pipe === "L" || pipe === "J") {
+  //     inside = !inside;
+  //   }
+  // }
+  //
+  // // // Check vertically downwards
+  // for (let i = point[0]; i < map.length; i++) {
+  //   const pipe = map[i][point[1]];
+  //   if (pipe === "|" || pipe === "L" || pipe === "J") {
+  //     inside = !inside;
+  //   }
+  // }
 
-  // Check horizontally to the right
-  for (let i = point[1]; i < map[0].length; i++) {
-    if (map[point[0]][i] === "o") {
-      right = !right;
-    }
-  }
-
-  // Check vertically upwards
-  for (let i = point[0]; i >= 0; i--) {
-    if (map[i][point[1]] === "o") {
-      up = !up;
-    }
-  }
-
-  // Check vertically downwards
-  for (let i = point[0]; i < map.length; i++) {
-    if (map[i][point[1]] === "o") {
-      down = !down;
-    }
-  }
-
-  return left && right && up && down;
-};
-
-const floodFill = (map: string[][], point: number[], fill: string) => {
-  const x = point[0];
-  const y = point[1];
-  if (
-    x < 0 ||
-    x >= map.length ||
-    y < 0 ||
-    y >= map[0].length ||
-    map[x][y] !== "."
-  ) {
-    return;
-  }
-  map[x][y] = fill;
-  floodFill(map, [x + 1, y], fill);
-  floodFill(map, [x - 1, y], fill);
-  floodFill(map, [x, y + 1], fill);
-  floodFill(map, [x, y - 1], fill);
-
-  return;
+  // return left && right && up && down;
+  return inside;
 };
 
 const findTiles = (map: string[][]) => {
@@ -179,10 +160,14 @@ const getNeighbors = (point: number[], val: string): number[][] => {
 const getStartNeighbors = (point: number[], map: string[][]): number[][] => {
   const neighbors = [];
   const [x, y] = point;
-  if (map[x - 1][y] !== ".") neighbors.push([x - 1, y]);
-  if (map[x + 1][y] !== ".") neighbors.push([x + 1, y]);
-  if (map[x][y - 1] !== ".") neighbors.push([x, y - 1]);
-  if (map[x][y + 1] !== ".") neighbors.push([x, y + 1]);
+  if (x > 0 && x < map.length) {
+    if (map[x - 1][y] !== ".") neighbors.push([x - 1, y]);
+    if (map[x + 1][y] !== ".") neighbors.push([x + 1, y]);
+  }
+  if (y > 0 && y < map[0].length) {
+    if (map[x][y - 1] !== ".") neighbors.push([x, y - 1]);
+    if (map[x][y + 1] !== ".") neighbors.push([x, y + 1]);
+  }
   return neighbors;
 };
 
@@ -191,37 +176,43 @@ const findInside = (map: string[][]): number => {
 
   for (let i = 0; i < map.length; i++) {
     for (let j = 0; j < map[0].length; j++) {
-      if (map[i][j] === ".") {
-        if (evenOddRule(map, [i, j])) {
-          count++;
-        }
+      if (map[i][j] === "." && evenOddRule(map, [i, j])) {
+        count++;
       }
     }
   }
   return count;
 };
 
-const markPath = (map: string[][], path: [string, number[]][]) => {
-  path.forEach(([_, [x, y]]) => {
-    map[x][y] = "o";
-  });
+const cleanMap = (map: string[][], path: [string, number[]][]) => {
+  const newMap = Array.from({ length: map.length }, () =>
+    Array(map[0].length).fill("."),
+  );
+  for (let i = 0; i < map.length; i++) {
+    for (let j = 0; j < map[0].length; j++) {
+      path.forEach((p) => {
+        if (i === p[1][0] && j === p[1][1]) newMap[i][j] = map[i][j];
+      });
+    }
+  }
+  return newMap;
 };
 
 export const partOne = (filename: string): number => {
-  const input = readAsStringArray(filename);
-  const [start, map] = createMap(input);
-  const path = dfs(map, start, start, [], []);
-  return path?.length! / 2;
+  // const input = readAsStringArray(filename);
+  // const [start, map] = createMap(input);
+  // const path = dfs(map, start, start, [], []);
+  // return path?.length! / 2;
+  return 0;
 };
 
 export const partTwo = (filename: string): number => {
   const input = readAsStringArray(filename);
-  const [start, map] = createMap(input);
+  let [start, map] = createMap(input);
   console.log();
-  const path = dfs(map, start, start, [], []);
-  markPath(map, path!);
-  let count = findInside(map);
+  const path = dfs(map, start, start, [], [])!;
+  map = cleanMap(map, path);
+  const count = findInside(map);
   map.forEach((line) => console.log(line.join("")));
-  console.log(count);
   return count;
 };
