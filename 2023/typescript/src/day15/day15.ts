@@ -1,56 +1,32 @@
 import { readAsString } from "../utils/getInput";
+import { HashMap } from "../utils/structures";
 
-type HashMap = { [index: number]: { key: string; value: number }[] };
-
-const put = (hashMap: HashMap, obj: [number, string, number]) => {
-  const [hash, key, val] = obj;
-  if (!hashMap[hash]) {
-    hashMap[hash] = [{ key: key, value: val }];
-  } else {
-    let found = false;
-    for (const list of hashMap[hash]) {
-      if (list.key === key) {
-        found = true;
-        list.value = val;
-      }
-    }
-    if (!found) hashMap[hash].push({ key: key, value: val });
-  }
-};
-
-const runHolidayAsciiStringHelper = (input: string) => {
+const runHolidayAsciiStringHelper = (key: string) => {
   let hash = 0;
-  input.split("").forEach((c) => {
+  key.split("").forEach((c) => {
     hash = ((hash + c.charCodeAt(0)) * 17) % 256;
   });
   return hash;
 };
 
-const parseInstruction = (instruction: string, hashMap: HashMap) => {
-  // console.log(instruction);
+const parseInstruction = (
+  instruction: string,
+  hashMap: HashMap<string, number>,
+) => {
   const [label, op, val] = instruction.split(/(?=[-=])|(?<=[-=])/);
-  const labelHash = runHolidayAsciiStringHelper(label);
   if (op === "-") {
-    // remove and adjust
-    if (hashMap[labelHash]) {
-      hashMap[labelHash] = hashMap[labelHash].filter(
-        (box) => box.key !== label,
-      );
-    }
+    hashMap.remove(label);
   } else if (op === "=") {
-    put(hashMap, [labelHash, label, parseInt(val)]);
+    hashMap.put(label, parseInt(val));
   }
-  // console.log(hashMap);
 };
 
-const focusPower = (hashMap: HashMap) => {
+const focusPower = (hashMap: HashMap<string, number>) => {
   let power = 0;
-  for (const index in hashMap) {
-    // console.log(hashMap[index]);
-    let lensPower = 0;
-
-    for (let i = 0; i < hashMap[index].length; i++) {
-      power += (parseInt(index) + 1) * (i + 1) * hashMap[index][i].value;
+  for (const index of hashMap) {
+    const table = hashMap.getIndex(index);
+    for (let i = 0; i < table.length; i++) {
+      power += (parseInt(index) + 1) * (i + 1) * table[i].value;
     }
   }
   return power;
@@ -67,7 +43,7 @@ export const partOne = (filename: string): number => {
 export const partTwo = (filename: string): number => {
   const input = readAsString(filename);
   const instructions = input.replace("\n", "").split(",");
-  const hashMap: HashMap = {} as HashMap;
+  const hashMap = new HashMap<string, number>(runHolidayAsciiStringHelper);
   instructions.map((i) => parseInstruction(i, hashMap));
   return focusPower(hashMap);
 };
