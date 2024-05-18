@@ -1,0 +1,41 @@
+package day{{.Day}}
+
+import (
+	"fmt"
+	"github.com/spf13/cobra"
+)
+
+func RegisterCommand(parent *cobra.Command) {
+	file1 := "input/day{{.Day}}/input.txt"
+	file2 := "input/day{{.Day}}/input.txt"
+	day{{.Day}}Cmd := &cobra.Command{
+		Use: "{{.Day}}",
+        Short: "Run Day {{.Day}} solutions",
+	}
+	partOneCmd := &cobra.Command{
+		Use: "1",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("Result:", runPartOne(file1))
+		},
+		Short: "Run Part One",
+	}
+	partTwoCmd := &cobra.Command{
+		Use: "2",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("Result:", runPartTwo(file2))
+		},
+		Short: "Run Part Two",
+	}
+	allCmd := &cobra.Command{
+		Use: "a",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("Result:", runPartOne(file1))
+			fmt.Println("Result:", runPartTwo(file2))
+		},
+		Short: "Run Parts One & Two",
+	}
+	parent.AddCommand(day{{.Day}}Cmd)
+	day{{.Day}}Cmd.AddCommand(partOneCmd)
+	day{{.Day}}Cmd.AddCommand(partTwoCmd)
+	day{{.Day}}Cmd.AddCommand(allCmd)
+}
