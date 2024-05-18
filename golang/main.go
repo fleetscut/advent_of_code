@@ -1,9 +1,9 @@
 package main
 
 import (
-    "aoc/golang/cmd"
+	"aoc/golang/cmd"
 )
 
 func main() {
-    cmd.Execute()
+	cmd.Execute()
 }

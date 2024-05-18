@@ -1,3 +1,5 @@
 target/
+input/
 input.txt
+**/example*.txt
 **/day*.txt
