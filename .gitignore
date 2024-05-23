@@ -3,3 +3,6 @@ input/
 input.txt
 **/example*.txt
 **/day*.txt
+
+**/node_modules/*
+package-lock.json

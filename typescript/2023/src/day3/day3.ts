@@ -43,6 +43,9 @@ const findPart = (grid: Grid<string>, point: Point): number => {
   while (col > 0 && grid.getPoint(testPoint).match(/[0-9]/)) {
     col--;
     testPoint = { x: point.x, y: col - 1 };
+    if (grid.getPoint(testPoint) === undefined) {
+      // console.log("moron");
+    }
   }
 
   let partNum = grid.getPoint({ x: point.x, y: col });

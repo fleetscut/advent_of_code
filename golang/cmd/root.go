@@ -22,6 +22,8 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	y2023.RegisterCommand(rootCmd)
 	gen.RegisterCommand(rootCmd)
+
+	rootCmd.PersistentFlags().Bool("ex", false, "Run with example.txt")
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(os.Stderr, err)
 		os.Exit(1)
