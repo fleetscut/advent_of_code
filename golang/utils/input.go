@@ -11,6 +11,15 @@ type inputType interface {
 	int | string
 }
 
+func ReadAsString(filename string) string {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		log.Fatal("Could not open file:", filename)
+	}
+	return string(data)
+
+}
+
 func ReadAsSlice[T inputType](filename string) []T {
 	f, err := os.Open(filename)
 	if err != nil {
