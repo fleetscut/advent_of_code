@@ -8,6 +8,7 @@ import (
 	"aoc/golang/2023/day3"
 	"aoc/golang/2023/day4"
 	"aoc/golang/2023/day5"
+	"aoc/golang/2023/day6"
 )
 
 func RegisterCommand(parent *cobra.Command) {
@@ -22,4 +23,5 @@ func RegisterCommand(parent *cobra.Command) {
 	day3.RegisterCommand(y2023)
 	day4.RegisterCommand(y2023)
 	day5.RegisterCommand(y2023)
+	day6.RegisterCommand(y2023)
 }
