@@ -10,6 +10,14 @@ type Point[T any] struct {
 	Val T
 }
 
+func NewPoint[T any](x, y int, value T) Point[T] {
+	return Point[T]{
+		X:   x,
+		Y:   y,
+		Val: value,
+	}
+}
+
 func (p Point[T]) GetPoint() (int, int) {
 	return p.X, p.Y
 }
@@ -22,8 +30,19 @@ func (p Point[T]) String() string {
 
 type Grid[T any] struct {
 	Field []Point[T]
-	W     int
-	H     int
+	W, H  int
+}
+
+func NewGrid[T any](width, height int, defaultValue T) *Grid[T] {
+	grid := make([]Point[T], height)
+
+	for y := range width {
+		for x := range height {
+			grid[width*y+x] = NewPoint(x, y, defaultValue)
+		}
+	}
+
+	return &Grid[T]{Field: grid, W: width, H: height}
 }
 
 func (g *Grid[T]) CheckPointInGrid(p Point[T]) bool {
@@ -57,11 +76,11 @@ func GridFromStringSlices[T any](input []string) (Grid[T], error) {
 			if err != nil {
 				return grid, err
 			}
-			grid.Field[width*y+x] = Point[T]{
+			grid.Field[width*y+x] = NewPoint(
 				x,
 				y,
 				val,
-			}
+			)
 		}
 	}
 
@@ -78,12 +97,11 @@ func (g *Grid[T]) GetPointNeighborsDiagonal(p Point[T]) (neighbors []Point[T]) {
 
 	for _, dir := range dirs {
 		n := Point[T]{
-			X:   p.X + dir.X,
-			Y:   p.Y + dir.Y,
-			Val: p.Val,
+			X: p.X + dir.X,
+			Y: p.Y + dir.Y,
 		}
 		if g.CheckPointInGrid(n) {
-			neighbors = append(neighbors, g.Field[g.Get2DIndex(n)])
+			neighbors = append(neighbors, g.Field[n.Y*g.W+n.X])
 		}
 	}
 	return
@@ -99,12 +117,11 @@ func (g *Grid[T]) GetPointNeighborsCardinal(p Point[T]) (neighbors []Point[T]) {
 
 	for _, dir := range dirs {
 		n := Point[T]{
-			X:   p.X + dir.X,
-			Y:   p.Y + dir.Y,
-			Val: p.Val,
+			X: p.X + dir.X,
+			Y: p.Y + dir.Y,
 		}
 		if g.CheckPointInGrid(n) {
-			neighbors = append(neighbors, g.Field[g.Get2DIndex(n)])
+			neighbors = append(neighbors, g.Field[n.Y*g.W+n.X])
 		}
 	}
 	return
@@ -137,4 +154,12 @@ func (g *Grid[T]) GetPoint(x, y int) (Point[T], error) {
 		return g.Field[y*g.W+x], nil
 	}
 	return Point[T]{}, fmt.Errorf("Point out of bounds")
+}
+
+func (g *Grid[T]) SetPoint(x, y int, value T) error {
+	if g.CheckXYInGrid(x, y) {
+		g.Field[y*g.W+x].Val = value
+	}
+
+	return fmt.Errorf("Point out of Bounds")
 }
