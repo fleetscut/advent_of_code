@@ -11,3 +11,10 @@ func GetGCD(a int, b int) int {
 		return GetGCD(b, a%b)
 	}
 }
+
+func Abs(val int) int {
+	if val < 0 {
+		return -val
+	}
+	return val
+}
