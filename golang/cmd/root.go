@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"aoc/golang/2023"
+	"aoc/golang/2024"
 	"aoc/golang/templates"
 )
 
@@ -21,6 +22,7 @@ var rootCmd = &cobra.Command{
 
 func Execute() {
 	y2023.RegisterCommand(rootCmd)
+	y2024.RegisterCommand(rootCmd)
 	gen.RegisterCommand(rootCmd)
 
 	rootCmd.PersistentFlags().Bool("ex", false, "Run with example.txt")
