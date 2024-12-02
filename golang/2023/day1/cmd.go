@@ -6,10 +6,10 @@ import (
 )
 
 func RegisterCommand(parent *cobra.Command) {
-	file1 := "input/day1/input.txt"
-	file2 := "input/day1/input.txt"
-	example := "input/day1/example.txt"
-	example2 := "input/day1/example2.txt"
+	file1 := "input/2023/day1/input.txt"
+	file2 := "input/2023/day1/input.txt"
+	example := "input/2023/day1/example.txt"
+	example2 := "input/2023/day1/example2.txt"
 
 	day1Cmd := &cobra.Command{
 		Use: "1",
