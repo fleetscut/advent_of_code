@@ -81,7 +81,7 @@ func geneateFromTemplates(year string, day string) {
 		if err != nil {
 			fmt.Println("Could not parse template: ", err)
 		}
-		if err := tmpl.Execute(file, struct{ Day string }{Day: day}); err != nil {
+		if err := tmpl.Execute(file, struct{ Day string; Year string }{Day: day, Year: year}); err != nil {
 			fmt.Println("Could not execute template: ", err)
 		} else {
 			fmt.Printf("Creating file: %v\n", filepath.Base(tmplFile))

@@ -1,4 +1,4 @@
-package day{{.Day}}
+package day2
 
 import (
 	"fmt"
@@ -6,13 +6,13 @@ import (
 )
 
 func RegisterCommand(parent *cobra.Command) {
-	file1 := "input/{{.Year}}/day{{.Day}}/input.txt"
-	file2 := "input/{{.Year}}/day{{.Day}}/input.txt"
-	example := "input/{{.Year}}/day{{.Day}}/example.txt"
+	file1 := "input/2024/day2/input.txt"
+	file2 := "input/2024/day2/input.txt"
+	example := "input/2024/day2/example.txt"
 
-	day{{.Day}}Cmd := &cobra.Command{
-		Use: "{{.Day}}",
-        Short: "Run Day {{.Day}} solutions",
+	day2Cmd := &cobra.Command{
+		Use: "2",
+        Short: "Run Day 2 solutions",
 	}
 	partOneCmd := &cobra.Command{
 		Use: "1",
@@ -50,8 +50,8 @@ func RegisterCommand(parent *cobra.Command) {
 		},
 		Short: "Run Parts One & Two",
 	}
-	parent.AddCommand(day{{.Day}}Cmd)
-	day{{.Day}}Cmd.AddCommand(partOneCmd)
-	day{{.Day}}Cmd.AddCommand(partTwoCmd)
-	day{{.Day}}Cmd.AddCommand(allCmd)
+	parent.AddCommand(day2Cmd)
+	day2Cmd.AddCommand(partOneCmd)
+	day2Cmd.AddCommand(partTwoCmd)
+	day2Cmd.AddCommand(allCmd)
 }
