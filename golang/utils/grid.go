@@ -34,14 +34,27 @@ type Grid[T any] struct {
 }
 
 func NewGrid[T any](width, height int, defaultValue T) *Grid[T] {
-	grid := make([]Point[T], height)
+	grid := make([]Point[T], width*height)
 
-	for y := range width {
-		for x := range height {
+	for y := range height {
+		for x := range width {
 			grid[width*y+x] = NewPoint(x, y, defaultValue)
 		}
 	}
 
+	return &Grid[T]{Field: grid, W: width, H: height}
+}
+
+func GridFromArray[T any](arr [][]T) *Grid[T] {
+	height := len(arr)
+	width := len(arr[0])
+	grid := make([]Point[T], width*height)
+
+	for y := range height {
+		for x := range width {
+			grid[width*y+x] = NewPoint(x, y, arr[y][x])
+		}
+	}
 	return &Grid[T]{Field: grid, W: width, H: height}
 }
 
@@ -88,12 +101,7 @@ func GridFromStringSlices[T any](input []string) (Grid[T], error) {
 }
 
 func (g *Grid[T]) GetPointNeighborsDiagonal(p Point[T]) (neighbors []Point[T]) {
-	dirs := map[string]Point[T]{
-		"NW": {X: -1, Y: -1},
-		"NE": {X: 1, Y: -1},
-		"SW": {X: -1, Y: 1},
-		"SE": {X: 1, Y: 1},
-	}
+	dirs := DiagonalDirs()
 
 	for _, dir := range dirs {
 		n := Point[T]{
@@ -108,12 +116,7 @@ func (g *Grid[T]) GetPointNeighborsDiagonal(p Point[T]) (neighbors []Point[T]) {
 }
 
 func (g *Grid[T]) GetPointNeighborsCardinal(p Point[T]) (neighbors []Point[T]) {
-	dirs := map[string]Point[T]{
-		"N": {X: 0, Y: -1},
-		"W": {X: -1, Y: 0},
-		"E": {X: 1, Y: 0},
-		"S": {X: 0, Y: 1},
-	}
+	dirs := CardinalDirs()
 
 	for _, dir := range dirs {
 		n := Point[T]{
@@ -127,8 +130,11 @@ func (g *Grid[T]) GetPointNeighborsCardinal(p Point[T]) (neighbors []Point[T]) {
 	return
 }
 
-func (g *Grid[T]) Get2DIndex(p Point[T]) int {
-	return g.Get2DIndexXY(p.X, p.Y)
+func (g *Grid[T]) Get2DIndex(p Point[T]) (int, error) {
+	if g.CheckXYInGrid(p.X, p.Y) {
+		return g.Get2DIndexXY(p.X, p.Y),nil
+	}
+	return 0, fmt.Errorf("Point %d,%d out of Bounds. Max x,y [%d, %d]", p.X,p.Y,g.W-1, g.H-1)
 }
 
 func (g *Grid[T]) Get2DIndexXY(x, y int) int {
@@ -153,7 +159,7 @@ func (g *Grid[T]) GetPoint(x, y int) (Point[T], error) {
 	if g.CheckXYInGrid(x, y) {
 		return g.Field[y*g.W+x], nil
 	}
-	return Point[T]{}, fmt.Errorf("Point out of bounds")
+	return Point[T]{}, fmt.Errorf("Point %d,%d out of Bounds. Max x,y [%d, %d]", x,y,g.W-1, g.H-1)
 }
 
 func (g *Grid[T]) SetPoint(x, y int, value T) error {
@@ -161,5 +167,23 @@ func (g *Grid[T]) SetPoint(x, y int, value T) error {
 		g.Field[y*g.W+x].Val = value
 	}
 
-	return fmt.Errorf("Point out of Bounds")
+	return fmt.Errorf("Point %d,%d out of Bounds. Max x,y [%d, %d]", x,y,g.W-1, g.H-1)
+}
+
+func CardinalDirs() map[string]Point[interface{}] {
+	return map[string]Point[interface{}]{
+		"N": {X: 0, Y: -1},
+		"W": {X: -1, Y: 0},
+		"E": {X: 1, Y: 0},
+		"S": {X: 0, Y: 1},
+	}
+}
+
+func DiagonalDirs() map[string]Point[interface{}] {
+	return map[string]Point[interface{}]{
+		"NW": {X: -1, Y: -1},
+		"NE": {X: 1, Y: -1},
+		"SW": {X: -1, Y: 1},
+		"SE": {X: 1, Y: 1},
+	}
 }

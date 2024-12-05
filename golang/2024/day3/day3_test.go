@@ -10,5 +10,5 @@ func TestPartOne(t *testing.T) {
 }
 
 func TestPartTwo(t *testing.T) {
-	utils.RunTest(0, "example.txt", 2024, 3 , t, runPartTwo)
+	utils.RunTest(48, "example2.txt", 2024, 3 , t, runPartTwo)
 }

@@ -73,7 +73,8 @@ func getPartNumber(grid *utils.Grid[rune], x, y int) (int, bool) {
 
 	testPoint, err = grid.GetPoint(x+1, y)
 	for x < grid.W && (testPoint.Val >= '0' && testPoint.Val <= '9') {
-		partString += string(grid.Field[grid.Get2DIndex(testPoint)].Val)
+		idx, _ := grid.Get2DIndex(testPoint)
+		partString += string(grid.Field[idx].Val)
 		x++
 		testPoint, err = grid.GetPoint(x+1, y)
 		if err != nil {

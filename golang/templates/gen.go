@@ -47,7 +47,7 @@ func geneateFromTemplates(year string, day string) {
 		log.Println(err)
 	}
 
-	inputDir := filepath.Join(wd, "input", "day"+day)
+	inputDir := filepath.Join(wd, "input", year,"day"+day)
 	fmt.Println("Creating input directory: ", inputDir)
 	err = createDir(inputDir)
 	if err != nil {
