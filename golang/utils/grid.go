@@ -10,6 +10,8 @@ type Point[T any] struct {
 	Val T
 }
 
+type Dir Point[any]
+
 func NewPoint[T any](x, y int, value T) Point[T] {
 	return Point[T]{
 		X:   x,
@@ -141,6 +143,10 @@ func (g *Grid[T]) Get2DIndexXY(x, y int) int {
 	return g.W*y + x
 }
 
+func (g *Grid[T]) IndexFrom2D(idx int) (x,y int){
+	return idx%g.W, idx/g.H
+}
+
 func (g *Grid[T]) PrintGrid() error {
 	for i, p := range g.Field {
 		r, err := ConvertToRune(p.Val)
@@ -162,12 +168,33 @@ func (g *Grid[T]) GetPoint(x, y int) (Point[T], error) {
 	return Point[T]{}, fmt.Errorf("Point %d,%d out of Bounds. Max x,y [%d, %d]", x,y,g.W-1, g.H-1)
 }
 
+func (g *Grid[T]) GetPointIndex(idx int) (Point[T], error) {
+	x, y := g.IndexFrom2D(idx)
+	if g.CheckXYInGrid(x,y){
+		p, err := g.GetPoint(x,y)
+		return p, err
+	}
+	return Point[T]{}, fmt.Errorf("Point %d,%d out of Bounds. Max x,y [%d, %d]", x,y,g.W-1, g.H-1)
+}
+
+
 func (g *Grid[T]) SetPoint(x, y int, value T) error {
 	if g.CheckXYInGrid(x, y) {
 		g.Field[y*g.W+x].Val = value
+		return nil
 	}
 
 	return fmt.Errorf("Point %d,%d out of Bounds. Max x,y [%d, %d]", x,y,g.W-1, g.H-1)
+}
+
+func (g *Grid[T]) FindInGrid(val T, cmp func(a, b T) bool ) (*Point[T], bool){
+	for i := range g.Field{
+		p := &g.Field[i]
+		if cmp(val, p.Val) {
+			return p, true
+		}
+	}
+	return nil,false
 }
 
 func CardinalDirs() map[string]Point[interface{}] {
@@ -186,4 +213,12 @@ func DiagonalDirs() map[string]Point[interface{}] {
 		"SW": {X: -1, Y: 1},
 		"SE": {X: 1, Y: 1},
 	}
+}
+
+func (g *Grid[T]) Copy() *Grid[T] {
+    copyGrid := *g // Shallow copy of the struct
+    // Deep copy the Field slice
+    copyGrid.Field = make([]Point[T], len(g.Field))
+    copy(copyGrid.Field, g.Field)
+    return &copyGrid
 }
