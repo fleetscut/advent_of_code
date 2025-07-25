@@ -6,9 +6,9 @@ import (
 )
 
 func TestPartOne(t *testing.T) {
-	utils.RunTest(41, "example.txt", 2024, 6 , t, runPartOne)
+	utils.RunTest(41, "example.txt", 2024, 6, t, runPartOne)
 }
 
 func TestPartTwo(t *testing.T) {
-	utils.RunTest(0, "example.txt", 2024, 6 , t, runPartTwo)
+	utils.RunTest(6, "example.txt", 2024, 6, t, runPartTwo)
 }

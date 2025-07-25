@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"maps"
 )
 
 /*
@@ -110,9 +111,7 @@ func (g *Grid[T]) GetPointNeighbors(p Point[T], includeDiagonals bool) []Point[T
 	dirs := CardinalDirs()
 	if includeDiagonals {
 		diags := DiagonalDirs()
-		for k, v := range diags {
-			dirs[k] = v
-		}
+		maps.Copy(dirs, diags)
 	}
 
 	var neighbors []Point[T]

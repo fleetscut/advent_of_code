@@ -7,7 +7,7 @@ import (
 )
 
 func search(input [][]string) int {
-	grid := utils.GridFromArray(input)
+	grid, _ := utils.GridFromArray(input)
 	count := 0
 
 	dirs := utils.CardinalDirs()
@@ -40,7 +40,7 @@ func findWord(grid *utils.Grid[string], point utils.Point[string], word string, 
 }
 
 func crossSearch(input [][]string) int {
-	grid := utils.GridFromArray(input)
+	grid, _ := utils.GridFromArray(input)
 	count := 0
 
 	for _, p := range grid.Field {

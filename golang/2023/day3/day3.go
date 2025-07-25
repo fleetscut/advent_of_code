@@ -38,9 +38,9 @@ func parseSchematic(input []string, find func(rune) bool) (parts []utils.Set[int
 	for _, p := range grid.Field {
 		if find(p.Val) {
 			set := make(utils.Set[int])
-			for _, n := range grid.GetPointNeighborsAll(p) {
+			for _, n := range grid.GetPointNeighbors(p, true) {
 				if n.Val >= '0' && n.Val <= '9' {
-					val, _ := getPartNumber(&grid, n.X, n.Y)
+					val, _ := getPartNumber(grid, n.X, n.Y)
 					set.Add(val)
 				}
 			}
