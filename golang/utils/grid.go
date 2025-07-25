@@ -1,63 +1,54 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 )
 
-type Point[T any] struct {
-	X   int
-	Y   int
-	Val T
+type Dir struct {
+	X int
+	Y int
 }
 
-type Dir Point[any]
-
-func NewPoint[T any](x, y int, value T) Point[T] {
-	return Point[T]{
-		X:   x,
-		Y:   y,
-		Val: value,
-	}
-}
-
-func (p Point[T]) GetPoint() (int, int) {
-	return p.X, p.Y
-}
-
-func (p Point[T]) String() string {
-	val, _ := ConvertToRune(p.Val)
-
-	return fmt.Sprintf("{x: %d, y: %d: %c}", p.X, p.Y, val)
-}
-
-type Grid[T any] struct {
+type Grid[T comparable] struct {
 	Field []Point[T]
 	W, H  int
 }
 
-func NewGrid[T any](width, height int, defaultValue T) *Grid[T] {
+func NewGrid[T comparable](width, height int, defaultValue T) (*Grid[T], error) {
+	if height <= 0 || width <= 0 {
+		return nil, errors.New("Width and height must be positive")
+	}
 	grid := make([]Point[T], width*height)
 
 	for y := range height {
 		for x := range width {
-			grid[width*y+x] = NewPoint(x, y, defaultValue)
+			grid[width*y+x] = Point[T]{X: x, Y: y, Val: defaultValue}
 		}
 	}
 
-	return &Grid[T]{Field: grid, W: width, H: height}
+	return &Grid[T]{Field: grid, W: width, H: height}, nil
 }
 
-func GridFromArray[T any](arr [][]T) *Grid[T] {
+func GridFromArray[T comparable](arr [][]T) (*Grid[T], error) {
 	height := len(arr)
+	if height == 0 {
+		return nil, errors.New("Invalid Height")
+	}
 	width := len(arr[0])
+	for _, line := range arr {
+		if len(line) != width {
+			return nil, errors.New("Row lengths do not match")
+		}
+	}
 	grid := make([]Point[T], width*height)
 
 	for y := range height {
 		for x := range width {
-			grid[width*y+x] = NewPoint(x, y, arr[y][x])
+			grid[width*y+x] = Point[T]{X: x, Y: y, Val: arr[y][x]}
 		}
 	}
-	return &Grid[T]{Field: grid, W: width, H: height}
+	return &Grid[T]{Field: grid, W: width, H: height}, nil
 }
 
 func (g *Grid[T]) CheckPointInGrid(p Point[T]) bool {
@@ -69,91 +60,80 @@ func (g *Grid[T]) CheckXYInGrid(x, y int) bool {
 
 }
 
-func (g *Grid[T]) GetPointNeighborsAll(p Point[T]) (neighbors []Point[T]) {
-	neighbors = append(neighbors, g.GetPointNeighborsDiagonal(p)...)
-	neighbors = append(neighbors, g.GetPointNeighborsCardinal(p)...)
-	return
-}
-
-func GridFromStringSlices[T any](input []string) (Grid[T], error) {
+func GridFromStringSlices[T comparable](input []string, parser func(r rune) (T, error)) (*Grid[T], error) {
 	height := len(input)
+	if height == 0 {
+		return nil, errors.New("Invalid height")
+	}
+
 	width := len(input[0])
+	for _, line := range input {
+		if len(line) != width {
+			return nil, errors.New("Row lengths do not match")
+		}
+	}
 
 	grid := Grid[T]{
-		W:     height,
-		H:     width,
+		W:     width,
+		H:     height,
 		Field: make([]Point[T], width*height),
 	}
 
 	for y, line := range input {
 		for x, c := range line {
-			val, err := ConvertRuneToType[T](c)
+			val, err := parser(c)
 			if err != nil {
-				return grid, err
+				return nil, err
 			}
-			grid.Field[width*y+x] = NewPoint(
-				x,
-				y,
-				val,
-			)
+			grid.Field[width*y+x] = Point[T]{
+				X:   x,
+				Y:   y,
+				Val: val,
+			}
 		}
 	}
 
-	return grid, nil
+	return &grid, nil
 }
 
-func (g *Grid[T]) GetPointNeighborsDiagonal(p Point[T]) (neighbors []Point[T]) {
-	dirs := DiagonalDirs()
-
-	for _, dir := range dirs {
-		n := Point[T]{
-			X: p.X + dir.X,
-			Y: p.Y + dir.Y,
-		}
-		if g.CheckPointInGrid(n) {
-			neighbors = append(neighbors, g.Field[n.Y*g.W+n.X])
-		}
-	}
-	return
-}
-
-func (g *Grid[T]) GetPointNeighborsCardinal(p Point[T]) (neighbors []Point[T]) {
+func (g *Grid[T]) GetPointNeighbors(p Point[T], includeDiagonals bool) []Point[T] {
 	dirs := CardinalDirs()
-
-	for _, dir := range dirs {
-		n := Point[T]{
-			X: p.X + dir.X,
-			Y: p.Y + dir.Y,
-		}
-		if g.CheckPointInGrid(n) {
-			neighbors = append(neighbors, g.Field[n.Y*g.W+n.X])
+	if includeDiagonals {
+		diags := DiagonalDirs()
+		for k, v := range diags {
+			dirs[k] = v
 		}
 	}
-	return
+
+	var neighbors []Point[T]
+	for _, dir := range dirs {
+		x, y := p.X+dir.X, p.Y+dir.Y
+		if g.CheckPointInGrid(n) {
+			neighbors = append(neighbors, g.Field[y*g.W+x])
+		}
+	}
+	return neighbors
 }
 
 func (g *Grid[T]) Get2DIndex(p Point[T]) (int, error) {
 	if g.CheckXYInGrid(p.X, p.Y) {
-		return g.Get2DIndexXY(p.X, p.Y),nil
+		return g.Get2DIndexXY(p.X, p.Y), nil
 	}
-	return 0, fmt.Errorf("Point %d,%d out of Bounds. Max x,y [%d, %d]", p.X,p.Y,g.W-1, g.H-1)
+	return 0, fmt.Errorf("Point %d,%d out of Bounds. Max x,y [%d, %d]", p.X, p.Y, g.W-1, g.H-1)
 }
 
 func (g *Grid[T]) Get2DIndexXY(x, y int) int {
 	return g.W*y + x
 }
 
-func (g *Grid[T]) IndexFrom2D(idx int) (x,y int){
-	return idx%g.W, idx/g.H
+func (g *Grid[T]) IndexFrom2D(idx int) (x, y int) {
+	return idx % g.W, idx / g.W
 }
 
-func (g *Grid[T]) PrintGrid() error {
+func (g *Grid[T]) PrintGrid(formatter func(T) string) error {
 	for i, p := range g.Field {
-		r, err := ConvertToRune(p.Val)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("%c", r)
+		r := formatter(p.Val)
+		fmt.Printf("%s", r)
 		if (i+1)%g.W == 0 {
 			fmt.Println("")
 		}
@@ -165,40 +145,37 @@ func (g *Grid[T]) GetPoint(x, y int) (Point[T], error) {
 	if g.CheckXYInGrid(x, y) {
 		return g.Field[y*g.W+x], nil
 	}
-	return Point[T]{}, fmt.Errorf("Point %d,%d out of Bounds. Max x,y [%d, %d]", x,y,g.W-1, g.H-1)
+	return Point[T]{}, fmt.Errorf("Point %d,%d out of Bounds. Max x,y [%d, %d]", x, y, g.W-1, g.H-1)
 }
 
 func (g *Grid[T]) GetPointIndex(idx int) (Point[T], error) {
 	x, y := g.IndexFrom2D(idx)
-	if g.CheckXYInGrid(x,y){
-		p, err := g.GetPoint(x,y)
-		return p, err
+	if g.CheckXYInGrid(x, y) {
+		return g.Field[idx], nil
 	}
-	return Point[T]{}, fmt.Errorf("Point %d,%d out of Bounds. Max x,y [%d, %d]", x,y,g.W-1, g.H-1)
+	return Point[T]{}, fmt.Errorf("Point %d,%d out of Bounds. Max x,y [%d, %d]", x, y, g.W-1, g.H-1)
 }
-
 
 func (g *Grid[T]) SetPoint(x, y int, value T) error {
 	if g.CheckXYInGrid(x, y) {
-		g.Field[y*g.W+x].Val = value
+		g.Field[y*g.W+x] = Point[T]{X: x, Y: y, Val: value}
 		return nil
 	}
 
-	return fmt.Errorf("Point %d,%d out of Bounds. Max x,y [%d, %d]", x,y,g.W-1, g.H-1)
+	return fmt.Errorf("Point %d,%d out of Bounds. Max x,y [%d, %d]", x, y, g.W-1, g.H-1)
 }
 
-func (g *Grid[T]) FindInGrid(val T, cmp func(a, b T) bool ) (*Point[T], bool){
-	for i := range g.Field{
-		p := &g.Field[i]
-		if cmp(val, p.Val) {
-			return p, true
+func (g *Grid[T]) FindInGrid(val T) (*Point[T], bool) {
+	for i := range g.Field {
+		if g.Field[i].Val == val {
+			return &g.Field[i], true
 		}
 	}
-	return nil,false
+	return nil, false
 }
 
-func CardinalDirs() map[string]Point[interface{}] {
-	return map[string]Point[interface{}]{
+func CardinalDirs() map[string]Dir {
+	return map[string]Dir{
 		"N": {X: 0, Y: -1},
 		"W": {X: -1, Y: 0},
 		"E": {X: 1, Y: 0},
@@ -206,8 +183,8 @@ func CardinalDirs() map[string]Point[interface{}] {
 	}
 }
 
-func DiagonalDirs() map[string]Point[interface{}] {
-	return map[string]Point[interface{}]{
+func DiagonalDirs() map[string]Dir {
+	return map[string]Dir{
 		"NW": {X: -1, Y: -1},
 		"NE": {X: 1, Y: -1},
 		"SW": {X: -1, Y: 1},
@@ -216,9 +193,9 @@ func DiagonalDirs() map[string]Point[interface{}] {
 }
 
 func (g *Grid[T]) Copy() *Grid[T] {
-    copyGrid := *g // Shallow copy of the struct
-    // Deep copy the Field slice
-    copyGrid.Field = make([]Point[T], len(g.Field))
-    copy(copyGrid.Field, g.Field)
-    return &copyGrid
+	copyGrid := *g // Shallow copy of the struct
+	// Deep copy the Field slice
+	copyGrid.Field = make([]Point[T], len(g.Field))
+	copy(copyGrid.Field, g.Field)
+	return &copyGrid
 }
