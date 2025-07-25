@@ -9,7 +9,7 @@ import (
 type Guard = Point[Dir]
 
 func createGrid(input [][]string) (*Grid[string], Guard) {
-	grid := GridFromArray(input)
+	grid, _ := GridFromArray(input)
 	guard := Point[Dir]{}
 
 	startDirs := map[string]Dir{
@@ -20,7 +20,7 @@ func createGrid(input [][]string) (*Grid[string], Guard) {
 	}
 
 	for k, v := range startDirs {
-		start, found := grid.FindInGrid(k, func(a, b string) bool { return a == b })
+		start, found := grid.FindInGrid(k)
 		if found {
 			start.Val = "."
 			guard = NewPoint(start.X, start.Y, v)
@@ -88,7 +88,7 @@ func crossPath(grid *Grid[string], guard Guard) int {
 				loops++
 			}
 		}
-		gridCopy.SetPoint(x+dir.X, y+dir.Y, ".")
+		gridCopy.SetPoint(obstruction.X, obstruction.Y, ".")
 	}
 	return loops
 }
@@ -101,7 +101,7 @@ func runPartOne(filename string) int {
 	return len(path)
 }
 
-//Still a bug
+// Still a bug
 func runPartTwo(filename string) int {
 	fmt.Println("Part Two")
 	input := ReadAsGrid[string](filename)

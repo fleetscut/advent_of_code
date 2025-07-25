@@ -33,7 +33,7 @@ func validateGears(input []string) (sum int) {
 }
 
 func parseSchematic(input []string, find func(rune) bool) (parts []utils.Set[int]) {
-	grid, _ := utils.GridFromStringSlices[rune](input)
+	grid, _ := utils.GridFromStringSlices[rune](input, func(r rune) (rune, error) { return r, nil })
 
 	for _, p := range grid.Field {
 		if find(p.Val) {

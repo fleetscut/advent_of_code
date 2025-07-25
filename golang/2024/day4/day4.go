@@ -28,7 +28,7 @@ func search(input [][]string) int {
 	return count
 }
 
-func findWord(grid *utils.Grid[string], point utils.Point[string], word string, dir utils.Point[interface{}]) bool {
+func findWord(grid *utils.Grid[string], point utils.Point[string], word string, dir utils.Dir) bool {
 	if len(word) == 0 {
 		return true
 	}
