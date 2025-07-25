@@ -5,6 +5,16 @@ import (
 	"fmt"
 )
 
+/*
+	TODO: A*
+		BFS
+		DFS
+		Weighted Tiles
+		Rotation/Flipping
+		Flood Fill
+		Pattern Matching
+*/
+
 type Dir struct {
 	X int
 	Y int
@@ -108,7 +118,7 @@ func (g *Grid[T]) GetPointNeighbors(p Point[T], includeDiagonals bool) []Point[T
 	var neighbors []Point[T]
 	for _, dir := range dirs {
 		x, y := p.X+dir.X, p.Y+dir.Y
-		if g.CheckPointInGrid(n) {
+		if g.CheckXYInGrid(x, y) {
 			neighbors = append(neighbors, g.Field[y*g.W+x])
 		}
 	}
